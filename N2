@@ -1,0 +1,57 @@
+import xml.etree.ElementTree as ET
+
+
+def only_lower_words(words):
+    lower_words = list()
+    for word in words:
+        lower_words.append(word.lower())
+    return lower_words
+
+
+def counter(any_type_words, top):
+    words = only_lower_words(any_type_words)
+    for word in words:
+        counter = 0
+        for other_word in words:
+            if word == other_word:
+                counter += 1
+        top[word] = counter
+    return top
+
+
+def top_list(top):
+    list_of_mentions = list()
+    for i in range(len(top)):
+        number_of_mentions = 0
+        popular_word = ''
+        for word in top:
+            if int(top[word]) > number_of_mentions:
+                number_of_mentions = top[word]
+                popular_word = word
+        list_of_mentions.append(popular_word)
+        del top[popular_word]
+    return list_of_mentions
+
+
+if __name__ == "__main__":
+    f = 'newsafr.xml'
+    tree = ET.parse(f)
+    root = tree.getroot()
+    items = root.findall(r'channel/item')
+
+    news = list()
+    long_words = list()
+
+    for item in items:
+        new = item.find('description').text
+        words = new.split()
+
+        for word in words:
+            if len(word) > 6:
+                long_words.append(word)
+    top = dict()
+    my_top_words = top_list(counter(long_words, top))
+
+
+
+    print(my_top_words[:10])
